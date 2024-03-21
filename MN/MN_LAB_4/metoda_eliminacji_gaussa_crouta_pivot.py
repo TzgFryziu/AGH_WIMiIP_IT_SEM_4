@@ -66,10 +66,8 @@ for i in range(len(macierz_rozszerzona)-1, -1, -1):
 
     wynik[i] = wynik[i] / macierz_rozszerzona[i][i]
 
-print("Nieuporzadkowane wyniki:")
-for i,x in zip(kolumny, wynik):
-    print(f"x{i} = {x}")
-
+print("wektor kolumn:")
+print(kolumny)
 print("Uporzadkowane wyniki:")
 for i,x in enumerate(wynik):
     print(f"x{i} = {x}")
