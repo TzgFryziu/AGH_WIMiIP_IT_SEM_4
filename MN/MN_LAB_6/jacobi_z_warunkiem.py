@@ -4,11 +4,11 @@ import numpy as np
 def read_matrix(file_name):
     with open(file_name, "r") as file:
         lines = file.readlines()
-        n = len(lines) - 1
+        n = len(lines)
         A = np.zeros((n, n))
         B = np.zeros(n)
         for i in range(n):
-            row = lines[i + 1].split()
+            row = lines[i].split()
             for j in range(n):
                 A[i][j] = float(row[j])
             B[i] = float(row[n])
@@ -25,18 +25,19 @@ def is_diagonally_dominant(matrix):
     return True
 
 
-def jacobi_method(A, B, iterations):
+def jacobi_method(A, B, epsilon, max_iterations):
+    iterations = 0
     n = len(A)
     x = np.zeros(n)
     L_plus_U = A - np.diag(np.diag(A))
     D_inv = np.diag(1 / np.diag(A))
-    for i in range(iterations):
-        x = np.dot(D_inv, B - np.dot(L_plus_U, x))
-    return x
-
-
-def gauss_method(A, B):
-    return np.linalg.solve(A, B)
+    for _ in range(max_iterations):
+        iterations += 1
+        x_new = np.dot(D_inv, B - np.dot(L_plus_U, x))
+        if np.linalg.norm(x_new - x) < epsilon:
+            break
+        x = x_new
+    return x, iterations
 
 
 def absolute_error(x1, x2):
@@ -44,27 +45,28 @@ def absolute_error(x1, x2):
 
 
 def print_matrices(L_plus_U, D_inv):
-    print("L + U:")
+    print("\nMatrix L + U:")
     print(L_plus_U)
-    print("\nD^-1:")
+    print("\nMatrix D^-1:")
     print(D_inv)
 
 
-def print_solution(x, iterations):
-    print("\nSolution after", iterations, "iterations:")
+def print_solution(x, iterations, epsilon):
+    print("\nRozwiazanie po ", iterations, "iiteracjach gdzie epsilon =", epsilon, ":")
     print(x)
 
 
 def main():
-    file_name = input("Enter the file name containing the matrix: ")
-    iterations = int(input("Enter the number of iterations: "))
+    file_name = input("Wpisz nazwe pliku: ")
+    epsilon_values = [0.001, 0.000001]
+    max_iterations = 1000000
     A, B = read_matrix(file_name)
 
-    print("\nMatrix A (augmented):")
+    print("\nMacierz A (Rozszerzona):")
     print(np.column_stack((A, B)))
 
     if not is_diagonally_dominant(A):
-        print("Matrix A is not diagonally dominant.")
+        print("Macierz A nie jest diagonalnie dominujaca.")
         return
 
     L_plus_U = A - np.diag(np.diag(A))
@@ -72,15 +74,9 @@ def main():
 
     print_matrices(L_plus_U, D_inv)
 
-    jacobi_x = jacobi_method(A, B, iterations)
-    print_solution(jacobi_x, iterations)
-
-    gauss_x = gauss_method(A, B)
-    print("\nSolution using Gauss method:")
-    print(gauss_x)
-
-    error = absolute_error(jacobi_x, gauss_x)
-    print("\nAbsolute error between Jacobi and Gauss solutions:", error)
+    for epsilon in epsilon_values:
+        jacobi_x, jacobi_iterations = jacobi_method(A, B, epsilon, max_iterations)
+        print_solution(jacobi_x, jacobi_iterations, epsilon)
 
 
 if __name__ == "__main__":
