@@ -17,20 +17,30 @@ def read_matrix(file_name):
 
 def is_diagonally_dominant(matrix):
     n = len(matrix)
+    waunek1 = True
+    warunek2 = 0
     for i in range(n):
-        if not (
-            2 * abs(matrix[i][i]) > sum(abs(matrix[i][j]) for j in range(n) if j != i)
-        ):
-            return False
-    return True
+        left = abs(matrix[i][i])
+        right = sum(abs(matrix[i][j]) for j in range(n) if j != i)
+        if left < right:
+            warunek1 = False
+        if left > right:
+            warunek2 += 1
+
+    return warunek2 or warunek1
 
 
 def jacobi_method(A, B, epsilon, max_iterations):
     iterations = 0
     n = len(A)
     x = np.zeros(n)
-    L_plus_U = A - np.diag(np.diag(A))
-    D_inv = np.diag(1 / np.diag(A))
+
+    D = np.diag(np.diag(A))
+
+    L_plus_U = A - D
+
+    D_inv = np.diag(1 / np.diag(D))
+
     for _ in range(max_iterations):
         iterations += 1
         x_new = np.dot(D_inv, B - np.dot(L_plus_U, x))
@@ -45,15 +55,18 @@ def absolute_error(x1, x2):
 
 
 def print_matrices(L_plus_U, D_inv):
-    print("\nMatrix L + U:")
+    print("\nMcierz L + U:")
     print(L_plus_U)
-    print("\nMatrix D^-1:")
+    print("\nMacierz D^-1:")
     print(D_inv)
 
 
 def print_solution(x, iterations, epsilon):
-    print("\nRozwiazanie po ", iterations, "iiteracjach gdzie epsilon =", epsilon, ":")
-    print(x)
+    print("\nRozwiazanie po ", iterations, "iteracjach gdzie epsilon =", epsilon, ":")
+    i = 0
+    for sol in x:
+        print(f"x[{i}] = {sol}")
+        i += 1
 
 
 def main():

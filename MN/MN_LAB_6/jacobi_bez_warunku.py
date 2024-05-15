@@ -17,19 +17,29 @@ def read_matrix(file_name):
 
 def is_diagonally_dominant(matrix):
     n = len(matrix)
+    waunek1 = True
+    warunek2 = 0
     for i in range(n):
-        if not (
-            2 * abs(matrix[i][i]) > sum(abs(matrix[i][j]) for j in range(n) if j != i)
-        ):
-            return False
-    return True
+        left = abs(matrix[i][i])
+        right = sum(abs(matrix[i][j]) for j in range(n) if j != i)
+        if left < right:
+            warunek1 = False
+        if left > right:
+            warunek2 += 1
+
+    return warunek2 or warunek1
 
 
 def jacobi_method(A, B, iterations):
     n = len(A)
     x = np.zeros(n)
-    L_plus_U = A - np.diag(np.diag(A))
-    D_inv = np.diag(1 / np.diag(A))
+
+    D = np.diag(np.diag(A))
+
+    L_plus_U = A - D
+
+    D_inv = np.diag(1 / np.diag(D))
+
     for i in range(iterations):
         x = np.dot(D_inv, B - np.dot(L_plus_U, x))
     return x
@@ -50,9 +60,11 @@ def print_matrices(L_plus_U, D_inv):
     print(D_inv)
 
 
-def print_solution(x, iterations):
-    print("\nRozwiazanie po ", iterations, "iteracjach:")
-    print(x)
+def print_solution(x):
+    i = 0
+    for sol in x:
+        print(f"x[{i}] = {sol}")
+        i += 1
 
 
 def main():
@@ -72,12 +84,13 @@ def main():
 
     print_matrices(L_plus_U, D_inv)
 
+    print("\nRozwiazanie po ", iterations, "iteracjach:")
     jacobi_x = jacobi_method(A, B, iterations)
-    print_solution(jacobi_x, iterations)
+    print_solution(jacobi_x)
 
     gauss_x = gauss_method(A, B)
     print("\nRozwiazanie metoda Gaussa:")
-    print(gauss_x)
+    print_solution(gauss_x)
 
     error = absolute_error(jacobi_x, gauss_x)
     print("\nBlad bezwzgledny:", error)
