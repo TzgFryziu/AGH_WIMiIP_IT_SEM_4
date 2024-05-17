@@ -58,3 +58,4 @@ lap1_img = cv2.filter2D(detail_enhanced_img, -1, lapl1)
 cv2.imwrite("ladny_kyc.png", sharpened_img)
 cv2.waitKey(0)  # Czeka na dowolny klawisz, aby zamknąć okno
 cv2.destroyAllWindows()  # Zamknij wszystkie okna
+
